@@ -1,17 +1,53 @@
-import express from 'express';
+import { eq } from 'drizzle-orm';
+import { index } from './db';
+import { departments } from './db/schema/schema';
 
-const app = express();
-const PORT = 8000;
+async function main() {
+  try {
+    console.log('Performing CRUD operations on departments...');
 
-// Use JSON middleware to parse incoming requests with JSON payloads
-app.use(express.json());
+    // CREATE: Insert a new department
+    const [newDept] = await index
+      .insert(departments)
+      .values({ 
+        code: 'CS', 
+        name: 'Computer Science', 
+        describe: 'Computer Science Department' 
+      })
+      .returning();
 
-// Root GET route returning a short message
-app.get('/', (req, res) => {
-  res.send( 'Hello, Welcome to the Classroom API!');
-});
+    if (!newDept) {
+      throw new Error('Failed to create department');
+    }
+    
+    console.log('✅ CREATE: New department created:', newDept);
 
-// Start the server and log the URL
-app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
-});
+    // READ: Select the department
+    const foundDept = await index.select().from(departments).where(eq(departments.id, newDept.id));
+    console.log('✅ READ: Found department:', foundDept[0]);
+
+    // UPDATE: Change the department's name
+    const [updatedDept] = await index
+      .update(departments)
+      .set({ name: 'Advanced Computer Science' })
+      .where(eq(departments.id, newDept.id))
+      .returning();
+    
+    if (!updatedDept) {
+      throw new Error('Failed to update department');
+    }
+    
+    console.log('✅ UPDATE: Department updated:', updatedDept);
+
+    // DELETE: Remove the department
+    await index.delete(departments).where(eq(departments.id, newDept.id));
+    console.log('✅ DELETE: Department deleted.');
+
+    console.log('\nCRUD operations completed successfully.');
+  } catch (error) {
+    console.error('❌ Error performing CRUD operations:', error);
+    process.exit(1);
+  }
+}
+
+main();
