@@ -9,4 +9,5 @@ CREATE TABLE "subjects" (
 	CONSTRAINT "subjects_code_unique" UNIQUE("code")
 );
 --> statement-breakpoint
-ALTER TABLE "subjects" ADD CONSTRAINT "subjects_department_id_departments_id_fk" FOREIGN KEY ("department_id") REFERENCES "public"."departments"("id") ON DELETE restrict ON UPDATE no action;
+ALTER TABLE "subjects" ADD CONSTRAINT "subjects_department_id_departments_id_fk" FOREIGN KEY ("department_id") REFERENCES "public"."departments"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "subjects_department_id_idx" ON "subjects" USING btree ("department_id");

@@ -1,5 +1,5 @@
 {
-  "id": "f7819cb2-8c15-4957-baab-46095d14f00d",
+  "id": "83de6c5d-e29f-4f95-b0f7-f725fb28d7cf",
   "prevId": "c7ce71bd-15f3-43ea-a7f4-bc13ef1f2293",
   "version": "7",
   "dialect": "postgresql",
@@ -134,7 +134,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "subjects_department_id_idx": {
+          "name": "subjects_department_id_idx",
+          "columns": [
+            {
+              "expression": "department_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "subjects_department_id_departments_id_fk": {
           "name": "subjects_department_id_departments_id_fk",

@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { migrate } from 'drizzle-orm/neon-http/migrator';
-import { index as db } from './db/index';
+import { db } from './db/index';
 
 async function runMigrations() {
   try {

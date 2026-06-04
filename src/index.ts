@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { index } from './db';
+import { db } from './db';
 import { departments } from './db/schema/schema';
 
 async function main() {
@@ -7,12 +7,12 @@ async function main() {
     console.log('Performing CRUD operations on departments...');
 
     // CREATE: Insert a new department
-    const [newDept] = await index
+    const [newDept] = await db
       .insert(departments)
       .values({ 
         code: 'CS', 
         name: 'Computer Science', 
-        describe: 'Computer Science Department' 
+        description: 'Computer Science Department' 
       })
       .returning();
 
@@ -23,11 +23,15 @@ async function main() {
     console.log('✅ CREATE: New department created:', newDept);
 
     // READ: Select the department
-    const foundDept = await index.select().from(departments).where(eq(departments.id, newDept.id));
-    console.log('✅ READ: Found department:', foundDept[0]);
+    const foundDept = await db.select().from(departments).where(eq(departments.id, newDept.id));
+    if (foundDept[0]) {
+      console.log('✅ READ: Found department:', foundDept[0]);
+    } else {
+      console.log('❌ READ: Department not found');
+    }
 
     // UPDATE: Change the department's name
-    const [updatedDept] = await index
+    const [updatedDept] = await db
       .update(departments)
       .set({ name: 'Advanced Computer Science' })
       .where(eq(departments.id, newDept.id))
@@ -40,7 +44,7 @@ async function main() {
     console.log('✅ UPDATE: Department updated:', updatedDept);
 
     // DELETE: Remove the department
-    await index.delete(departments).where(eq(departments.id, newDept.id));
+    await db.delete(departments).where(eq(departments.id, newDept.id));
     console.log('✅ DELETE: Department deleted.');
 
     console.log('\nCRUD operations completed successfully.');

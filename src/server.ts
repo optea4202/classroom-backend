@@ -1,7 +1,7 @@
 import express from 'express';
 
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8000;
 
 // Use JSON middleware to parse incoming requests with JSON payloads
 app.use(express.json());
