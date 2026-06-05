@@ -1,10 +1,14 @@
 import express from 'express';
+import subjectRouter from './routes/subject';
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8000;
 
 // Use JSON middleware to parse incoming requests with JSON payloads
 app.use(express.json());
+
+// Mount routes
+app.use('/subjects', subjectRouter);
 
 // Root GET route returning a short message
 app.get('/', (req, res) => {

@@ -1,57 +1,33 @@
-import { eq } from 'drizzle-orm';
-import { db } from './db';
-import { departments } from './db/schema/schema';
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import subjectsRouter from "./routes/subject";
 
-async function main() {
-  try {
-    console.log('Performing CRUD operations on departments...');
+const app = express();
+const PORT = 8000;
 
-    // CREATE: Insert a new department
-    const [newDept] = await db
-      .insert(departments)
-      .values({ 
-        code: 'CS', 
-        name: 'Computer Science', 
-        description: 'Computer Science Department' 
-      })
-      .returning();
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}))
 
-    if (!newDept) {
-      throw new Error('Failed to create department');
-    }
-    
-    console.log('✅ CREATE: New department created:', newDept);
+// Enable CORS (Cross-Origin Resource Sharing)
+app.use(cors());
 
-    // READ: Select the department
-    const foundDept = await db.select().from(departments).where(eq(departments.id, newDept.id));
-    if (foundDept[0]) {
-      console.log('✅ READ: Found department:', foundDept[0]);
-    } else {
-      console.log('❌ READ: Department not found');
-    }
+// Middleware to parse incoming JSON requests
+app.use(express.json());
 
-    // UPDATE: Change the department's name
-    const [updatedDept] = await db
-      .update(departments)
-      .set({ name: 'Advanced Computer Science' })
-      .where(eq(departments.id, newDept.id))
-      .returning();
-    
-    if (!updatedDept) {
-      throw new Error('Failed to update department');
-    }
-    
-    console.log('✅ UPDATE: Department updated:', updatedDept);
+// API Routes (supports both plural and singular endpoints)
+app.use('/api/subjects', subjectsRouter);
+app.use('/api/subject', subjectsRouter);
 
-    // DELETE: Remove the department
-    await db.delete(departments).where(eq(departments.id, newDept.id));
-    console.log('✅ DELETE: Department deleted.');
+// Root Health Check Route
+app.get('/', (req, res) => {
+  res.send('Hello, welcome to the Classroom API!');
+});
 
-    console.log('\nCRUD operations completed successfully.');
-  } catch (error) {
-    console.error('❌ Error performing CRUD operations:', error);
-    process.exit(1);
-  }
-}
-
-main();
+// Start the Server
+app.listen(PORT, () => {
+  console.log(`Server is running at http://localhost:${PORT}`);
+});
