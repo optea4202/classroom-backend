@@ -1,17 +1,33 @@
+import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
+import subjectsRouter from "./routes/subject";
 
 const app = express();
 const PORT = 8000;
 
-// Use JSON middleware to parse incoming requests with JSON payloads
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}))
+
+// Enable CORS (Cross-Origin Resource Sharing)
+app.use(cors());
+
+// Middleware to parse incoming JSON requests
 app.use(express.json());
 
-// Root GET route returning a short message
+// API Routes (supports both plural and singular endpoints)
+app.use('/api/subjects', subjectsRouter);
+app.use('/api/subject', subjectsRouter);
+
+// Root Health Check Route
 app.get('/', (req, res) => {
-  res.send( 'Hello, Welcome to the Classroom API!');
+  res.send('Hello, welcome to the Classroom API!');
 });
 
-// Start the server and log the URL
+// Start the Server
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
